@@ -30,13 +30,18 @@ int main(int argc, char *argv[])
 
     myNet.setTestWeights();
 
-    myNet.train(trainSet,setSize,0,0);
+    myNet.train(trainSet,setSize,0.25,0);
+
+    myNet.outputWeights();
 
     qDebug() << "Active neuron = "<< myNet.recognize(input);
-    //myNet.TestBackPropagation();
 
     delete [] neuroNetSize;
     delete [] input;
+    for (int i = 0; i < setSize; ++i) {
+        trainSet[i];
+    }
+    delete [] trainSet;
 
     return 0;
 //    return a.exec();

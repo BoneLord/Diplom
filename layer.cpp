@@ -29,10 +29,6 @@ void Layer::initialization() {
     }
 }
 
-int Layer::getDimension() const {
-    return mySize;
-}
-
 int Layer::getPrevSize() const {
     return myPrevSize;
 }
@@ -53,7 +49,7 @@ void Layer::setWeights(int prevLayerSize, int layerSize, double weigth) {
     myWeights[prevLayerSize][layerSize] = weigth;
 }
 
-double * Layer::computeOutput(double *input) {
+double * Layer::computeOutput(double *input) const {
     double *inducedLocalFields = computeInducedLocalField(input);
     double *res = new double [mySize];
     for (int i = 0; i < mySize; ++i) {
@@ -63,7 +59,7 @@ double * Layer::computeOutput(double *input) {
     return res;
 }
 
-double * Layer::computeInducedLocalField(double *input) {
+double * Layer::computeInducedLocalField(double *input) const {
     double *inducedLocalFields = new double [mySize];
     for (int i = 0; i < mySize; ++i) {
         double inducedLocalField = myWeights[0][i];
@@ -75,7 +71,7 @@ double * Layer::computeInducedLocalField(double *input) {
     return inducedLocalFields;
 }
 
-double * Layer::backPropagation(double *gradients) {
+double * Layer::backPropagation(double *gradients) const {
     double *weightedSum = new double[myPrevSize];
     for (int i = 0; i < myPrevSize; ++i) {
         for (int j = 0; j < mySize; ++j) {
@@ -86,31 +82,32 @@ double * Layer::backPropagation(double *gradients) {
 }
 
 //NE PROVERENO!!!!
-double** Layer::updateWeights(double **deltas, double regularizationParameter) {
-    double **oldWeights = copyWeights(mySize, myPrevSize);
-    for (int i = 0; i < myPrevSize; ++i) {
-        double *weights = myWeights[i];
-        double *delta = deltas[i];
-
-        int l = mySize - 1;
-        for (int j = 0; j < l; ++j) {
-            weights[j] += delta[j] + computeRegularization(regularizationParameter, weights[j]);
+/*double** Layer::updateWeights(double **deltas, double regularizationParameter) {
+    //double **oldWeights = copyWeights(mySize, myPrevSize);*/
+void Layer::updateWeights(double **deltas, double regularizationParameter) {
+    for (int j = 0; j < mySize; ++j) {
+        myWeights[0][j] += deltas[0][j];
+        for (int i = 1; i < myPrevSize; ++i) {
+            myWeights[i][j] += deltas[i][j] + computeRegularization(regularizationParameter, myWeights[i][j]);
         }
-        weights[l] += delta[l];
     }
-    return oldWeights;
+//    return oldWeights;
 }
 
-double Layer::computeRegularization(double regularizationParameter, double weight) {
-    double w0_2 = pow(regularizationParameter,2);
-    return 2 * (w0_2 * weight) / pow(w0_2 + pow(weight,2),2);
+double Layer::computeRegularization(double regularizationParameter, double weight) const {
+    double w0 = pow(regularizationParameter,2);
+    return 2 * (w0 * weight) / pow(w0 + pow(weight,2),2);
 }
 
-double** Layer::updateWeights(double **deltas) {
-    return updateWeights(deltas, 0);
+//double** Layer::updateWeights(double **deltas) {
+//    return updateWeights(deltas, 0);
+//}
+
+void Layer::updateWeights(double **deltas) {
+    updateWeights(deltas, 0);
 }
 
-double** Layer::copyWeights(int inputLength, int length) {
+double** Layer::copyWeights(int inputLength, int length) const {
     double **oldWeights = new double * [length];
     for (int i = 0; i < length; ++i) {
         oldWeights[i] = new double [inputLength];
