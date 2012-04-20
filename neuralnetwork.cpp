@@ -218,10 +218,10 @@ void NeuralNetwork::Trainer::train() {
         error = epoch();
         ++count;
         myErrors.push_back(error);
-        deltaError = abs(prevError - error);
+        deltaError = fabs(prevError - error);
         myRateOfLearning = initialRateLearning / (1 + count / 10.);
     }
-    while (deltaError > 0.01 || deltaError / prevError > 0.001 || count > 500);
+    while (deltaError > 0.01 || deltaError / prevError > 0.001 || count > 500);    
 }
 
 double NeuralNetwork::Trainer::epoch() {
@@ -250,7 +250,7 @@ double NeuralNetwork::Trainer::epoch() {
             averageError += error;
 
             int lengthLO = myNet->myLayerCount+1;
-            for (int k = 0; k < lengthLO; ++k) {
+            for (int k = 1; k < lengthLO; ++k) {
                 delete [] layersOutputs[k];
             }
             delete [] layersOutputs;

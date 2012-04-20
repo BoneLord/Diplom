@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     delete [] neuroNetSize;
     delete [] input;
     for (int i = 0; i < setSize; ++i) {
-        trainSet[i];
+        delete trainSet[i];
     }
     delete [] trainSet;
 
