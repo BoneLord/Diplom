@@ -1,8 +1,8 @@
 #include "neuralnetwork.h"
 #include <QDebug>
-#include <float.h>
-#include <math.h>
-#include <limits.h>
+#include <cfloat>
+#include <cmath>
+#include <climits>
 
 NeuralNetwork::NeuralNetwork(int layerCount, int *layerSizes, double minInput, double maxInput) {
     myLayerCount = layerCount-1;

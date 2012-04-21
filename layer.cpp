@@ -1,7 +1,7 @@
 #include "layer.h"
-#include <math.h>
-#include<cstdlib>
-#include<ctime>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include <QDebug>
 
 Layer::Layer(int prevLayerSize, int layerSize) {
