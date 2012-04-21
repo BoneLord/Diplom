@@ -307,7 +307,6 @@ double* NeuralNetwork::Trainer::computeGradientForHiddenLayer(Layer *layer, doub
     double *g = new double[vectorDimension];
     for (int i = 0; i < vectorDimension; ++i) {
         g[i] = layerOutput[i] * (1 - layerOutput[i]) * weightedSum[i+1];
-
     }
     return g;
 }
