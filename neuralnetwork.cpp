@@ -356,7 +356,7 @@ double NeuralNetwork::Trainer::computeError(double *rightAnswer, double *network
     double error = 0;
     for (int k = 0; k < myRightAnswersLength; ++k) {
         double e = networkOutput[k] - rightAnswer[k];
-        error += pow(e,2);
+        error += e * e;
     }
     return error / 2;
 }

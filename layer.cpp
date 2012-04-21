@@ -99,8 +99,9 @@ void Layer::updateWeights(double **deltas, double regularizationParameter) {
 }
 
 double Layer::computeRegularization(double regularizationParameter, double weight) const {
-    double w0 = pow(regularizationParameter,2);
-    return 2 * (w0 * weight) / pow(w0 + pow(weight,2),2);
+    double w0 = regularizationParameter * regularizationParameter;
+    double w1 = weight * weight;
+    return 2 * (w0 * weight) / ((w0 + w1) * (w0 + w1));
 }
 
 //double** Layer::updateWeights(double **deltas) {
