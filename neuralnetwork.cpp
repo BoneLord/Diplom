@@ -221,7 +221,7 @@ void NeuralNetwork::Trainer::train() {
         deltaError = fabs(prevError - error);
         myRateOfLearning = initialRateLearning / (1 + count / 10.);
     }
-    while (deltaError > 0.01 || deltaError / prevError > 0.001 || count > 500);    
+    while (deltaError > 0.01 || deltaError / prevError > 0.001 || count > 500);
 }
 
 double NeuralNetwork::Trainer::epoch() {
@@ -307,6 +307,7 @@ double* NeuralNetwork::Trainer::computeGradientForHiddenLayer(Layer *layer, doub
     double *g = new double[vectorDimension];
     for (int i = 0; i < vectorDimension; ++i) {
         g[i] = layerOutput[i] * (1 - layerOutput[i]) * weightedSum[i+1];
+
     }
     return g;
 }

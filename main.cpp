@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     neuroNetSize[2] = 1;
 
     NeuralNetwork myNet(countLayers, neuroNetSize, 0, 1);
+    myNet.outputWeights();
 
     int lengthInput = 2;
     double * input;
