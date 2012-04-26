@@ -3,9 +3,8 @@
 #include <QDebug>
 #include "trainingsetelement.h"
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
+int main(void) {
+
 
     int countLayers = 3;
     int * neuroNetSize;
@@ -25,14 +24,14 @@ int main(int argc, char *argv[])
     int setSize = 1;
     TrainingSetElement **trainSet = new TrainingSetElement * [setSize];
     for (int i = 0; i < setSize; ++i) {
-        trainSet[i] = new TrainingSetElement(input,0);
+        trainSet[i] = new TrainingSetElement(2,input,0);
     }
 
     myNet.setTestWeights();
 
     myNet.train(trainSet,setSize,0.25,0);
 
-    myNet.outputWeights();
+//    myNet.outputWeights();
 
     qDebug() << "Active neuron = "<< myNet.recognize(input);
 
@@ -44,5 +43,4 @@ int main(int argc, char *argv[])
     delete [] trainSet;
 
     return 0;
-//    return a.exec();
 }

@@ -28,7 +28,10 @@ int NeuralNetwork::recognize(double * input) {
     int length = myLayer[myLayerCount-1]->getSize();
     for (int i = 0; i < length; ++i) {
         double value = prevOutput[i];
-        qDebug() << "Value in neuron exit = " << value;
+
+//        Debug
+//        qDebug() << "Value in neuron exit = " << value;
+
         if (value > max) {
             max = value;
             maxIndex = i;
@@ -165,7 +168,7 @@ NeuralNetwork::Trainer::Trainer(NeuralNetwork *net,TrainingSetElement **training
         myRightAnswers[i] = new double [outputVectorDimension];
     }
 
-    double functionMax = 0.9;
+    double functionMax = 1.;
     double functionMin = 0.;
     for (int i = 0; i < outputVectorDimension; ++i) {
         double *rightAnswer = myRightAnswers[i];
@@ -238,11 +241,14 @@ double NeuralNetwork::Trainer::epoch() {
             std::vector<double*> *vector = myTrainingSet[j];
             double *inputVector = vector->at(i);
             double **layersOutputs = myNet->forwardComputation(inputVector);
-            for (int m = 0; m < myNet->myLayerCount+1; ++m) {
-                for (int n = 0; n < 2; ++n) {
-                    qDebug() << "layersOutputs[][]" << layersOutputs[m][n];
-                }
-            }
+
+//            Debug
+//            for (int m = 0; m < myNet->myLayerCount+1; ++m) {
+//                for (int n = 0; n < 2; ++n) {
+//                    qDebug() << "layersOutputs[][]" << layersOutputs[m][n];
+//                }
+//            }
+
             backwardComputation(layersOutputs, rightAnswer);
 
             double *networkOutput = layersOutputs[myNet->myLayerCount];
@@ -263,12 +269,12 @@ void NeuralNetwork::Trainer::backwardComputation(double **layersOutputs, double 
     double **gradients = computeGradients(layersOutputs, rightAnswer);
     updateWeights(gradients, layersOutputs);
 
-    //Debug
-    for (int i = 0; i < myNet->myLayerCount; ++i) {
-        for (int j = 0; j < 2; ++j) {
-            qDebug() << "gradients[][] = " << gradients[i][j];
-        }
-    }
+//    Debug
+//    for (int i = 0; i < myNet->myLayerCount; ++i) {
+//        for (int j = 0; j < 2; ++j) {
+//            qDebug() << "gradients[][] = " << gradients[i][j];
+//        }
+//    }
 
     int length = myNet->myLayerCount;
     for (int i = 0; i < length; ++i) {
@@ -319,12 +325,12 @@ void NeuralNetwork::Trainer::updateWeights(double **gradients, double **layersOu
         int inputLength = layer->getSize();
         double **deltas = computeDeltas(gradients[i], lengthLayer, layersOutputs[i], inputLength, myPreviousDeltas[i]);
 
-        // Debug
-        for (int k = 0; k < lengthLayer; ++k) {
-            for (int j = 0; j < inputLength; ++j) {
-                qDebug() << "deltas[][] = " << deltas[k][j];
-            }
-        }
+//        Debug
+//        for (int k = 0; k < lengthLayer; ++k) {
+//            for (int j = 0; j < inputLength; ++j) {
+//                qDebug() << "deltas[][] = " << deltas[k][j];
+//            }
+//        }
 
         layer->updateWeights(deltas, myRegularizationParameter);
         myPreviousDeltas[i] = deltas;
@@ -366,21 +372,3 @@ double NeuralNetwork::Trainer::computeError(double *rightAnswer, double *network
 //        Collections.shuffle(vector);
 //    }
 //}
-
-
-
-
-
-
-
-/**
-
-  Берём set (состоящий из массива символов)
-  Подаём его на вход Тренера
-  Считаем выход НС, нам надо будет сохранить все выходы и совокупные выходы.
-  Попадает ли разность между целевым образцом и реальным выходом сети в допустимые рамки?
-  Вычисляем ошибку для каждого выходго слоя
-  Для каждого скрытого слоя вычисляем ошибки
-
-
-  */

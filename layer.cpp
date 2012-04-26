@@ -76,10 +76,10 @@ double * Layer::backPropagation(double *gradients) const {
     double *weightedSum = new double[myPrevSize];
     for (int i = 0; i < myPrevSize; ++i) {
         for (int j = 0; j < mySize; ++j) {
-            qDebug() << "gradients[j]" << gradients[j];
-            qDebug() << "myWeights[i][j]" << myWeights[i][j];
+//            qDebug() << "gradients[j]" << gradients[j];
+//            qDebug() << "myWeights[i][j]" << myWeights[i][j];
             weightedSum[i] += gradients[j] * myWeights[i][j];
-            qDebug() << "weightedSum[i]" << weightedSum[i];
+//            qDebug() << "weightedSum[i]" << weightedSum[i];
         }
     }
     return weightedSum;
