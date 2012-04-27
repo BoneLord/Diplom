@@ -1,6 +1,11 @@
 #ifndef LAYER_H
 #define LAYER_H
 
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <QDebug>
+
 class Layer {
 private:
     double **myWeights;
@@ -21,6 +26,8 @@ public:
     double * computeOutput(double *input) const;
     double * backPropagation(double *gradients) const;
 
+    const double* getNeuronWeights(int numberNeuron) const;
+    void setWeightsLayer(double **weights);
     double getWeights(int prevLayerSize, int layerSize) const; // Test method
     void setWeights(int prevLayerSize, int layerSize, double weigth); // Test method
 

@@ -4,6 +4,12 @@
 #include "layer.h"
 #include <vector>
 #include "trainingsetelement.h"
+#include <QDebug>
+#include <cfloat>
+#include <cmath>
+#include <climits>
+#include <iostream>
+#include <fstream>
 
 class NeuralNetwork {
 private:
@@ -48,6 +54,7 @@ private:
     Layer* getOutputLayer() const;
     NeuralNetwork(const NeuralNetwork& another);
     NeuralNetwork& operator=(const NeuralNetwork& another);
+    double*** readWeightsFromFile(char *fileName) const;
 public:
     NeuralNetwork(int layerCount, int *layerSizes, double minInput, double maxInput);
     ~NeuralNetwork();
@@ -55,6 +62,8 @@ public:
     double * advancedRecognize(double *input);
     void train(TrainingSetElement **input, int setSize, double rateOfLearning, double regularizationParameter);
 
+    void writeWeightsToFile(char *fileName) const;
+    void setWeightsFromFile(char *fileName);
     void setTestWeights(); //test method
     void outputWeights(); //test method
 };

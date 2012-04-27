@@ -1,8 +1,4 @@
 #include "neuralnetwork.h"
-#include <QDebug>
-#include <cfloat>
-#include <cmath>
-#include <climits>
 
 NeuralNetwork::NeuralNetwork(int layerCount, int *layerSizes, double minInput, double maxInput) {
     myLayerCount = layerCount-1;
@@ -82,9 +78,6 @@ Layer* NeuralNetwork::getOutputLayer() const {
 }
 
 void NeuralNetwork::train(TrainingSetElement **input, int setSize, double rateOfLearning, double regularizationParameter) {
-//     NeuralNetwork::Trainer *trainer;
-//     trainer = new NeuralNetwork::Trainer::Trainer(this, input, rateOfLearning, regularizationParameter, setSize);
-//     trainer->train();
     NeuralNetwork::Trainer trainer(this, input, rateOfLearning, regularizationParameter, setSize);
     trainer.train();
 }
@@ -121,10 +114,54 @@ void NeuralNetwork::outputWeights() {
     for (int layerNum = 0; layerNum < myLayerCount; ++layerNum) {
         for (int i = 0; i < myLayer[layerNum]->getPrevSize(); ++i) {
             for (int j = 0; j < myLayer[layerNum]->getSize(); ++j) {
-                qDebug() << myLayer[layerNum]->getWeights(i,j);
+                std::cout << myLayer[layerNum]->getWeights(i,j) << " ";
             }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
+    }
+}
+
+void NeuralNetwork::writeWeightsToFile(char *fileName) const {
+    std::ofstream outputFile(fileName, std::ios::out | std::ios::binary);
+    if (!outputFile.is_open()) {
+        return;
+    }
+    for (int layerNum = 0; layerNum < myLayerCount; ++layerNum) {
+        int length = myLayer[layerNum]->getPrevSize();
+        for (int i = 0; i < length; ++i) {
+            int layerSize = myLayer[layerNum]->getSize();
+            outputFile.write((char*) myLayer[layerNum]->getNeuronWeights(i), layerSize * sizeof(double));
         }
     }
+    outputFile.close();
+}
+
+double*** NeuralNetwork::readWeightsFromFile(char *fileName) const {
+    std::ifstream inputFile(fileName, std::ios::in | std::ios::binary);
+    if (!inputFile.is_open()) {
+        return NULL;
+    }
+    double ***weights = new double ** [myLayerCount];
+    for (int layerNum = 0; layerNum < myLayerCount; ++layerNum) {
+        int length = myLayer[layerNum]->getPrevSize();
+        weights[layerNum] = new double * [length];
+        for (int i = 0; i < length; ++i) {
+            int layerSize = myLayer[layerNum]->getSize();
+            weights[layerNum][i] = new double [layerSize];
+            inputFile.read((char *) weights[layerNum][i], layerSize * sizeof(double));
+        }
+    }
+    inputFile.close();
+    return weights;
+}
+
+void NeuralNetwork::setWeightsFromFile(char *fileName) {
+    double ***weights = readWeightsFromFile(fileName);
+    for (int layerNum = 0; layerNum < myLayerCount; ++layerNum) {
+        myLayer[layerNum]->setWeightsLayer(weights[layerNum]);
+    }
+    delete [] weights;
 }
 
 //==========================================================================================================================
@@ -137,6 +174,13 @@ NeuralNetwork::Trainer::Trainer(NeuralNetwork *net,TrainingSetElement **training
     myRegularizationParameter = regularizationParameter;
 
     myPreviousDeltas = new double ** [net->myLayerCount];
+
+    //==========================================================
+    int length = net->myLayerCount;
+    for (int i = 0; i < length; ++i) {
+        myPreviousDeltas[i] = NULL;
+    }
+    //==========================================================
     myMomentConstant = 0.3;
     Layer* outputLayer = net->getOutputLayer();
     myNet = net;
@@ -177,11 +221,24 @@ NeuralNetwork::Trainer::Trainer(NeuralNetwork *net,TrainingSetElement **training
         }
         rightAnswer[i] = functionMax;
     }
+
+//    for (int i = 0;i < outputVectorDimension; ++i) {
+//        for (int k = 0; k < outputVectorDimension; ++k) {
+//            std::cout << myRightAnswers[i][k] << " ";
+//        }
+//        std::cout << std::endl;
+//    }
+//    std::cout << std::endl;
 }
 
 NeuralNetwork::Trainer::~Trainer() {
     for (int i = 0; i < myRightAnswersLength; ++i) {
         delete [] myRightAnswers[i];
+        int length = myTrainingSet[i]->size();
+        for (int j = 0; j < length; ++j) {
+            double * temp = myTrainingSet[i]->at(j);
+            delete [] temp;
+        }
         delete myTrainingSet[i];
     }
     delete [] myRightAnswers;
@@ -240,18 +297,26 @@ double NeuralNetwork::Trainer::epoch() {
             double *rightAnswer = myRightAnswers[j];
             std::vector<double*> *vector = myTrainingSet[j];
             double *inputVector = vector->at(i);
-            double **layersOutputs = myNet->forwardComputation(inputVector);
 
-//            Debug
-//            for (int m = 0; m < myNet->myLayerCount+1; ++m) {
-//                for (int n = 0; n < 2; ++n) {
-//                    qDebug() << "layersOutputs[][]" << layersOutputs[m][n];
+//            for (int k = 0; k < 14*14; ++k) {
+//                std::cout << inputVector[k] << " ";
+//                if ((k+1) % 14 == 0) {
+//                    std::cout << std::endl;
 //                }
 //            }
+//            std::cout << std::endl;
+
+            double **layersOutputs = myNet->forwardComputation(inputVector);
 
             backwardComputation(layersOutputs, rightAnswer);
 
             double *networkOutput = layersOutputs[myNet->myLayerCount];
+
+//            for (int k = 0; k < myRightAnswersLength; ++k) {
+//                std::cout << networkOutput[k] << " ";
+//            }
+//            std::cout << std::endl;
+
             double error = computeError(rightAnswer, networkOutput);
             averageError += error;
 
@@ -333,6 +398,14 @@ void NeuralNetwork::Trainer::updateWeights(double **gradients, double **layersOu
 //        }
 
         layer->updateWeights(deltas, myRegularizationParameter);
+        //DELETE DELTA[i] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        if (myPreviousDeltas[i] != NULL) {
+            double **temp = myPreviousDeltas[i];
+            for (int j = 0; j < lengthLayer; ++j) {
+                delete [] temp[j];
+            }
+            delete [] temp;
+        }
         myPreviousDeltas[i] = deltas;
     }
 }
@@ -348,7 +421,10 @@ double** NeuralNetwork::Trainer::computeDeltas(double *gradient, int length,
 
         deltas[0][j] = v;
         for (int i = 1; i < length; ++i) {
+//            qDebug() << "layerInput[i-1] = " << layerInput[i-1];
+//            qDebug() << "getPreviousDelta(previousDelta, i, j) = " << getPreviousDelta(previousDelta, i, j);
             deltas[i][j] = v * layerInput[i-1] + myMomentConstant * getPreviousDelta(previousDelta, i, j);
+//            qDebug() << "deltas[i][j] = " << deltas[i][j];
         }
     }
     return deltas;

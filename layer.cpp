@@ -1,8 +1,4 @@
 #include "layer.h"
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <QDebug>
 
 Layer::Layer(int prevLayerSize, int layerSize) {
     myPrevSize = prevLayerSize+1;
@@ -28,6 +24,18 @@ void Layer::initialization() {
             myWeights[i][j] = 0.6 * rand() / RAND_MAX - 0.3;
         }
     }
+}
+
+const double* Layer::getNeuronWeights(int numberNeuron) const {
+    return myWeights[numberNeuron];
+}
+
+void Layer::setWeightsLayer(double **weights) {
+    for (int i = 0; i < myPrevSize; ++i) {
+        delete [] myWeights[i];
+    }
+    delete [] myWeights;
+    myWeights = weights;
 }
 
 int Layer::getPrevSize() const {
