@@ -10,6 +10,7 @@
 #include <climits>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 class NeuralNetwork {
 private:

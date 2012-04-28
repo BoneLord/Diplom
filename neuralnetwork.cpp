@@ -285,7 +285,7 @@ void NeuralNetwork::Trainer::train() {
 }
 
 double NeuralNetwork::Trainer::epoch() {
-//    shuffleTrainingSet();
+    shuffleTrainingSet();
 
     double averageError = 0;
     int length = myRightAnswersLength;
@@ -443,8 +443,9 @@ double NeuralNetwork::Trainer::computeError(double *rightAnswer, double *network
     return error / 2;
 }
 
-//void NeuralNetwork::Trainer::shuffleTrainingSet() {
-//    for (std::vector<double*> vector : myTrainingSet) {
-//        Collections.shuffle(vector);
-//    }
-//}
+void NeuralNetwork::Trainer::shuffleTrainingSet() {
+    for (int i = 0; i < myRightAnswersLength; ++i) {
+        std::vector<double*> *trainingSet = myTrainingSet[i];
+        random_shuffle(trainingSet->begin(), trainingSet->end());
+    }
+}

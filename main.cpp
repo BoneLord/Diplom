@@ -36,11 +36,12 @@ int main(void) {
 //        }
 //        std::cout << std::endl;
 //    }
+    char fileName[] = "weights.dat";
+//    myNet.setWeightsFromFile(fileName);
 
     myNet.train(trainSet,setSize,0.25,0);
-    char fileName[] = "weights.dat";
-    myNet.writeWeightsToFile(fileName);
-    myNet.setWeightsFromFile(fileName);
+
+//    myNet.writeWeightsToFile(fileName);
 
     std::cout << "Active neuron = " << myNet.recognize(trainSet[0]->getData()) << std::endl;
 
